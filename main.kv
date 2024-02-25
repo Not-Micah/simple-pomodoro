@@ -1,0 +1,192 @@
+<AppSettings>:
+    size_hint: 1, None
+    height: dp(455)
+    orientation: "vertical"
+    spacing: dp(5)
+
+    # theme selection
+    MDBoxLayout:
+        padding: dp(5), dp(5)
+        size_hint: 1, .3
+
+        MDCarousel:
+            size_hint: 1, 1
+            background_color: "#FFFFFF"
+            id: carousel
+
+    # break timers
+    MDBoxLayout:
+        size_hint: 1, .2
+        orientation: "horizontal"
+        spacing: dp(30)
+
+        MDTextField:
+            hint_text: "Short Break (m)"
+            id: short_break
+            input_filter: 'int'
+            max_text_length: 2
+
+        MDTextField:
+            hint_text: "Long Break (m)"
+            id: long_break
+            input_filter: 'int'
+            max_text_length: 2
+
+    MDTextField:
+        size_hint: 1, .145
+        hint_text: "Pomodoro (m)"
+        id: pomodoro
+        input_filter: 'int'
+        max_text_length: 2
+
+    # music + notifcation toggler
+    MDFloatLayout:  
+        padding: dp(5), dp(5)
+        size_hint: 1, .175
+        orientation: "horizontal"
+        
+        MDLabel:
+            markup: True
+            text: "[b]Alert Sound[/b]"
+            color: "#8F8F8F"
+            pos_hint: {"x":.05, "center_y":.6}
+
+        Switch:
+            pos_hint: {"x":.25, "center_y":.6}
+            id: alert_toggler
+
+    MDBoxLayout:
+        size_hint: .6, .1
+        spacing: dp(25)
+        padding: dp(0), dp(10)
+
+        MDRaisedButton:
+            text: "Apply"
+            size_hint_x: .5
+            elevation: 0
+            md_bg_color: "#8F8F8F"
+            on_press: app.threaded_save()
+
+        MDRaisedButton:
+            text: "Cancel"
+            size_hint_x: .5
+            elevation: 0
+            md_bg_color: "#8F8F8F"
+            on_press: app.settings_dialog.dismiss()
+
+MDScreen:
+    MDFloatLayout:
+        id: main
+
+        FitImage:
+            id: background
+            size_hint: 1, 1
+            opacity: 0
+            pos_hint: {"center_x":.5, "center_y": .5}
+            # source: app.themes[app.background_index+1]
+        
+        MDBoxLayout:
+            id: main_container
+            pos_hint: {"center_x":.5, "center_y":.5}
+            size_hint: None, None
+            width: dp(300)
+            height: dp(175)
+            orientation: "vertical"
+            padding: dp(5), dp(5)
+
+            MDBoxLayout:
+                id: timer_container
+                size_hint: 1, .8
+                spacing: dp(30)
+
+                MDLabel:
+                    id: timer
+                    markup: True
+                    text: ""
+                    font_size: dp(90)
+                    color: "#FFFFFF"
+                    halign: "center"
+
+            MDFloatLayout:                      # float layout so 2 layouts can be piled on each other (1 hidden)...
+                id: button_container
+                size_hint: 1, .2
+
+                MDBoxLayout:
+                    orientation: "horizontal"
+                    size_hint: 1, 1
+                    pos_hint: {"center_x":.5, "center_y":.5}
+                    spacing: dp(7.5)
+                    opacity: 1
+                    id: default_buttons
+
+                    MDRectangleFlatButton:
+                        markup: True
+                        id: timer_button
+                        text: "[b]start[/b]"
+                        on_release: 
+                            app.start_timer(timer_button.text)
+                        font_size: dp(20)
+                        text_color: "#FFFFFF"
+                        line_color: "#FFFFFF"
+                        size_hint: 0.6, 1
+                        ripple_scale: 0
+
+                    MDIconButton:
+                        id: restart_button
+                        icon: "restart"
+                        size_hint: 0.25, 1
+                        on_release:
+                            app.restart_timer()
+                        icon_size: dp(30)
+                        ripple_scale: 0
+                    
+                    MDIconButton:
+                        id: setting_button
+                        icon: "pencil"
+                        size_hint: 0.25, 1
+                        on_release:
+                            app.open_settings()
+                        icon_size: dp(30)
+                        ripple_scale: 0
+
+                ######
+                MDBoxLayout:
+                    orientation: "horizontal"
+                    size_hint: 1, 1
+                    opacity: 0
+                    pos_hint: {"center_x":.5, "center_y":.5}
+                    spacing: dp(7.5)
+                    id: break_buttons
+
+                    MDRectangleFlatButton:
+                        id: short_button
+                        text: "short brk"
+                        disabled: True
+                        size_hint: .15, 1
+                        text_color: "#FFFFFF"
+                        line_color: "#FFFFFF"
+                        on_release: 
+                            app.start_break(app.short_break)
+                            app.active_break = "Short"
+
+                    MDRectangleFlatButton:
+                        id: long_button
+                        text: "long brk"
+                        disabled: True
+                        size_hint: .15, 1
+                        text_color: "#FFFFFF"
+                        line_color: "#FFFFFF"
+                        on_release: 
+                            app.start_break(app.long_break)
+                            app.active_break = "Long"
+
+                    MDRectangleFlatButton:
+                        id: continue_button
+                        text: "continue"
+                        disabled: True
+                        size_hint: .15, 1
+                        text_color: "#FFFFFF"
+                        line_color: "#FFFFFF"
+                        on_release: 
+                            app.start_break(app.default)
+                            app.active_state = "Timer"
